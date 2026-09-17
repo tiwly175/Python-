@@ -260,19 +260,180 @@
     .lesson-title { font-size: 22px; }
   }
 
-@keyframes hackerPulse {
-  0% { text-shadow: 0 0 4px #00ff66, 0 0 10px #00ff66; opacity: 0.85; }
-  100% { text-shadow: 0 0 14px #00ff66, 0 0 25px #00ff66; opacity: 1; }
-}
-  
+  /* ================================================================
+     HACKER-MODE ADD-ONS: boot sequence, matrix rain, terminal, toasts
+     ================================================================ */
+
+  /* ---------- Matrix rain background ---------- */
+  #matrixCanvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+  }
+  #matrixCanvas.on { opacity: 0.10; }
+  .app { position: relative; z-index: 1; }
+
+  /* ---------- Boot screen ---------- */
+  #bootScreen {
+    position: fixed; inset: 0; z-index: 1000;
+    background: #05080A;
+    color: var(--green);
+    font-family: 'Fira Code', monospace;
+    display: flex; flex-direction: column;
+    padding: 26px 26px 20px;
+    overflow: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #bootScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  #bootLog {
+    flex: 1; overflow-y: auto; font-size: 12.5px; line-height: 1.9;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  #bootLog .ln { opacity: 0; animation: lnIn 0.15s ease forwards; }
+  #bootLog .ok { color: var(--green); }
+  #bootLog .dim { color: var(--ink-faint); }
+  #bootLog .warn { color: var(--amber); }
+  #bootLog .tag { color: var(--magenta); }
+  @keyframes lnIn { to { opacity: 1; } }
+  .boot-caret { display: inline-block; width: 7px; height: 13px; background: var(--green); vertical-align: -2px; animation: blink 1.1s step-end infinite; }
+  #bootSkip {
+    align-self: flex-end;
+    margin-top: 14px;
+    background: none; border: 1px solid var(--line-bright); color: var(--ink-dim);
+    font-family: 'Fira Code', monospace; font-size: 11px; padding: 7px 12px; border-radius: 6px;
+    cursor: pointer;
+  }
+  #bootSkip:hover { color: var(--green); border-color: var(--green); }
+
+  /* ---------- Glitch text ---------- */
+  .glitch { position: relative; display: inline-block; }
+  .glitch.glitching::before,
+  .glitch.glitching::after {
+    content: attr(data-text);
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+    overflow: hidden; background: transparent;
+  }
+  .glitch.glitching::before {
+    color: var(--magenta);
+    clip-path: inset(0 0 60% 0);
+    animation: glitchTop 0.35s steps(2, end) 2;
+    transform: translate(-2px, -1px);
+  }
+  .glitch.glitching::after {
+    color: var(--green);
+    clip-path: inset(60% 0 0 0);
+    animation: glitchBot 0.35s steps(2, end) 2;
+    transform: translate(2px, 1px);
+  }
+  @keyframes glitchTop { 0% { transform: translate(-2px,-1px);} 50% { transform: translate(3px,-2px);} 100% { transform: translate(-1px,0);} }
+  @keyframes glitchBot { 0% { transform: translate(2px,1px);} 50% { transform: translate(-3px,2px);} 100% { transform: translate(1px,0);} }
+
+  /* ---------- HUD (time / system status) ---------- */
+  .hud {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--ink-faint);
+    padding: 10px 20px; border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .hud .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+  .hud span.sep { color: var(--ink-faint); }
+
+  /* ---------- Terminal launcher + panel ---------- */
+  #termLauncher {
+    position: fixed; right: 20px; bottom: 20px; z-index: 60;
+    width: 46px; height: 46px; border-radius: 10px;
+    background: var(--bg-elev2); border: 1px solid var(--line-bright); color: var(--green);
+    font-family: 'Fira Code', monospace; font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: var(--shadow);
+  }
+  #termLauncher:hover { border-color: var(--green); box-shadow: var(--glow-green); }
+  #termLauncher .blip { position: absolute; top: -3px; right: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--magenta); box-shadow: 0 0 6px var(--magenta); display: none; }
+
+  #termPanel {
+    position: fixed; right: 20px; bottom: 78px; z-index: 60;
+    width: 380px; max-width: calc(100vw - 40px);
+    height: 320px; max-height: 60vh;
+    background: var(--code-bg); border: 1px solid var(--line-bright); border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: none; flex-direction: column; overflow: hidden;
+    font-family: 'Fira Code', monospace;
+  }
+  #termPanel.open { display: flex; }
+  .term-panel-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--bg-elev2); border-bottom: 1px solid var(--line); }
+  .term-panel-bar .fname { font-size: 11px; color: var(--ink-dim); }
+  .term-panel-bar .term-close { margin-right: auto; margin-left: 0; }
+  .term-close { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 13px; padding: 2px 6px; }
+  .term-close:hover { color: var(--magenta); }
+  #termOutput { flex: 1; overflow-y: auto; padding: 12px 14px; font-size: 12px; line-height: 1.75; color: var(--ink); }
+  #termOutput .out-line { white-space: pre-wrap; word-break: break-word; margin-bottom: 3px; }
+  #termOutput .in-echo { color: var(--green); }
+  #termOutput .in-echo::before { content: "$ "; color: var(--ink-faint); }
+  #termOutput .out-err { color: var(--magenta); }
+  #termOutput .out-dim { color: var(--ink-faint); }
+  .term-panel-input { display: flex; align-items: center; gap: 7px; border-top: 1px solid var(--line); padding: 9px 12px; }
+  .term-panel-input .prompt { color: var(--green); font-size: 12.5px; }
+  .term-panel-input input {
+    flex: 1; background: none; border: none; outline: none; color: var(--ink);
+    font-family: 'Fira Code', monospace; font-size: 12.5px;
+  }
+
+  /* ---------- Toasts ---------- */
+  #toastStack {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 200; display: flex; flex-direction: column; gap: 8px;
+    width: min(360px, calc(100vw - 32px)); pointer-events: none;
+  }
+  .toast {
+    background: var(--bg-elev2); border: 1px solid var(--line-bright); border-radius: 9px;
+    padding: 11px 14px; box-shadow: var(--shadow);
+    font-family: 'Fira Code', monospace; font-size: 12px; color: var(--ink);
+    display: flex; align-items: flex-start; gap: 9px;
+    opacity: 0; transform: translateY(-10px);
+    animation: toastIn 0.35s ease forwards;
+    border-right: 3px solid var(--green);
+  }
+  .toast.warn { border-right-color: var(--amber); }
+  .toast.tag { border-right-color: var(--magenta); }
+  .toast .toast-ic { flex-shrink: 0; }
+  .toast.leaving { animation: toastOut 0.3s ease forwards; }
+  @keyframes toastIn { to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(-8px) scale(0.97); } }
+
+  @media (max-width: 860px) {
+    #termPanel { right: 12px; left: 12px; width: auto; bottom: 74px; }
+    #termLauncher { right: 16px; bottom: 16px; }
+  }
 </style>
 </head>
 <body>
 
+<canvas id="matrixCanvas"></canvas>
+
+<div id="bootScreen">
+  <div id="bootLog"></div>
+  <button id="bootSkip">ข้าม [ANY KEY]</button>
+</div>
+
+<div id="toastStack"></div>
+
+<button id="termLauncher" title="เปิดเทอร์มินัล (หรือกด `)"><span class="mono">&gt;_</span><span class="blip" id="termBlip"></span></button>
+<div id="termPanel">
+  <div class="term-panel-bar">
+    <button class="term-close" id="termClose">✕</button>
+    <div class="term-dots"><span></span><span></span><span></span></div>
+    <span class="fname">~/python-from-zero — sh</span>
+  </div>
+  <div id="termOutput"></div>
+  <div class="term-panel-input">
+    <span class="prompt">$</span>
+    <input id="termInput" type="text" autocomplete="off" spellcheck="false" placeholder="พิมพ์ help แล้ว Enter">
+  </div>
+</div>
+
 <div class="app">
   <div class="topbar">
     
-   <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0; color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.8); animation: hackerPulse 1.5s ease-in-out infinite alternate;">py_by.Patcharaphon</h1></div>
+    <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0;">py_by.Patcharaphon</h1></div>
     
     <button class="menu-toggle" id="menuToggle">☰ สารบัญ</button>
   </div>
@@ -280,8 +441,8 @@
   <nav class="sidebar" id="sidebar">
     <div class="term-head">
       <div class="term-dots"><span></span><span></span><span></span></div>
-
-      <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0; color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.8); animation: hackerPulse 1.5s ease-in-out infinite alternate;">py_by.Patcharaphon</h1></div>
+      
+      <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 class="glitch" id="brandTitle" data-text="py_by.Patcharaphon" style="margin: 0;">py_by.Patcharaphon</h1></div>
       
       <p class="brand-sub"><span class="cursor"></span>~/python-from-zero</p>
     </div>
@@ -295,6 +456,15 @@
     </div>
 
     <div class="nav-scroll" id="moduleNav"></div>
+
+    <div class="hud">
+      <span class="dot"></span>
+      <span id="hudClock">--:--:--</span>
+      <span class="sep">·</span>
+      <span>uptime <span id="hudUptime">0m</span></span>
+      <span class="sep">·</span>
+      <span>node #py-01</span>
+    </div>
   </nav>
 
   <main class="main" id="main"></main>
@@ -773,7 +943,7 @@ function renderMain() {
     </div>
     <div class="content-pad">
       <p class="crumb">${module.file}<span class="sep">/</span>${lesson.file}</p>
-      <h2 class="lesson-title">${lesson.title}<span class="cursor"></span></h2>
+      <h2 class="lesson-title glitch" data-text="${lesson.title}">${lesson.title}<span class="cursor"></span></h2>
       <p class="lesson-tagline">${lesson.tagline}</p>
 
       <div class="lesson-body">${lesson.body}</div>
@@ -804,6 +974,20 @@ function renderMain() {
       saveProgress();
       renderSidebar();
       document.getElementById("doneBtn").textContent = "✓ เรียนจบแล้ว";
+      triggerGlitch(document.querySelector(".lesson-title.glitch"));
+      showToast({ text: `${lesson.file} บันทึกแล้ว — ความคืบหน้าอัปเดต`, kind: "ok", icon: "✓" });
+
+      const moduleDone = module.lessons.every(l => completed.includes(l.id));
+      if (moduleDone) {
+        setTimeout(() => {
+          showToast({ text: `โมดูล "${module.title}" เคลียร์ครบแล้ว — ไปต่อโมดูลถัดไปได้เลย`, kind: "tag", icon: "🏆" });
+        }, 650);
+      }
+      if (completed.length === all.length) {
+        setTimeout(() => {
+          showToast({ text: `จบคอร์สแล้ว! ยินดีด้วย นักพัฒนา — ไปดูขั้นตอนถัดไปได้ในบทสุดท้าย`, kind: "tag", icon: "🐍" });
+        }, 1200);
+      }
     }
   });
   if (prev) document.getElementById("prevBtn").addEventListener("click", () => goTo(prev.id));
@@ -826,6 +1010,279 @@ document.getElementById("menuToggle").addEventListener("click", () => {
 
 renderSidebar();
 renderMain();
+
+/* ================================================================
+   HACKER-MODE ADD-ONS
+   ================================================================ */
+
+/* ---------- Glitch helper ---------- */
+function triggerGlitch(el) {
+  if (!el) return;
+  el.classList.remove("glitching");
+  void el.offsetWidth; /* restart animation */
+  el.classList.add("glitching");
+  setTimeout(() => el.classList.remove("glitching"), 380);
+}
+setInterval(() => {
+  const t = document.getElementById("brandTitle");
+  if (t && Math.random() < 0.5) triggerGlitch(t);
+}, 9000);
+
+/* ---------- Toasts ---------- */
+function showToast({ text, kind = "ok", icon = "●", timeout = 4200 }) {
+  const stack = document.getElementById("toastStack");
+  const el = document.createElement("div");
+  el.className = "toast" + (kind === "warn" ? " warn" : kind === "tag" ? " tag" : "");
+  el.innerHTML = `<span class="toast-ic">${icon}</span><span>${text}</span>`;
+  stack.appendChild(el);
+  const remove = () => {
+    el.classList.add("leaving");
+    setTimeout(() => el.remove(), 280);
+  };
+  setTimeout(remove, timeout);
+}
+
+/* ---------- HUD clock ---------- */
+const hudStart = performance.now();
+function fmtClock(d) {
+  return [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, "0")).join(":");
+}
+function tickHud() {
+  const clockEl = document.getElementById("hudClock");
+  const upEl = document.getElementById("hudUptime");
+  if (clockEl) clockEl.textContent = fmtClock(new Date());
+  if (upEl) {
+    const mins = Math.floor((performance.now() - hudStart) / 60000);
+    const secs = Math.floor(((performance.now() - hudStart) % 60000) / 1000);
+    upEl.textContent = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+  }
+}
+tickHud();
+setInterval(tickHud, 1000);
+
+/* ---------- Matrix rain ---------- */
+const matrixCanvas = document.getElementById("matrixCanvas");
+const mctx = matrixCanvas.getContext("2d");
+let matrixOn = false;
+let matrixCols = [];
+const matrixChars = "アイウエオカキクケコサシスセソ01ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@%+-<>/{}[]()".split("");
+
+function resizeMatrix() {
+  matrixCanvas.width = window.innerWidth;
+  matrixCanvas.height = window.innerHeight;
+  const fontSize = 15;
+  const cols = Math.ceil(matrixCanvas.width / fontSize);
+  matrixCols = new Array(cols).fill(0).map(() => Math.floor(Math.random() * -40));
+}
+window.addEventListener("resize", resizeMatrix);
+resizeMatrix();
+
+function drawMatrix() {
+  if (!matrixOn) return;
+  const fontSize = 15;
+  mctx.fillStyle = "rgba(5,8,10,0.14)";
+  mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  mctx.font = fontSize + "px 'Fira Code', monospace";
+  for (let i = 0; i < matrixCols.length; i++) {
+    const ch = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+    const x = i * fontSize;
+    const y = matrixCols[i] * fontSize;
+    mctx.fillStyle = Math.random() < 0.04 ? "#D9E6E0" : "#3EE08C";
+    mctx.fillText(ch, x, y);
+    if (y > matrixCanvas.height && Math.random() > 0.975) matrixCols[i] = 0;
+    matrixCols[i]++;
+  }
+  requestAnimationFrame(drawMatrix);
+}
+function setMatrix(on) {
+  matrixOn = on;
+  matrixCanvas.classList.toggle("on", on);
+  if (on) { mctx.fillStyle = "#05080A"; mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height); drawMatrix(); }
+}
+
+/* ---------- Boot sequence ---------- */
+const BOOT_LINES = [
+  { t: "dim", m: "[ 0.001024 ] initializing kernel modules..." },
+  { t: "dim", m: "[ 0.041882 ] mounting ~/python-from-zero" },
+  { t: "ok",  m: "[  OK  ] loaded module: 01_เริ่มต้น" },
+  { t: "ok",  m: "[  OK  ] loaded module: 02_ตรรกะ" },
+  { t: "ok",  m: "[  OK  ] loaded module: 03_data-structures" },
+  { t: "ok",  m: "[  OK  ] loaded module: 04_error-handling" },
+  { t: "ok",  m: "[  OK  ] loaded module: 05_oop" },
+  { t: "ok",  m: "[  OK  ] loaded module: 06_flask-web" },
+  { t: "dim", m: "[ 0.884213 ] linking progress.log ..." },
+  { t: "warn",m: "[ WARN ] user has unfinished lessons — this is normal" },
+  { t: "tag", m: "[ INFO ] instructor: by.Patcharaphon" },
+  { t: "dim", m: "[ 1.204091 ] starting interactive shell..." },
+  { t: "ok",  m: "ACCESS GRANTED — ยินดีต้อนรับกลับเข้าสู่ระบบ" }
+];
+function runBoot() {
+  const boot = document.getElementById("bootScreen");
+  const log = document.getElementById("bootLog");
+  const skip = document.getElementById("bootSkip");
+
+  if (sessionStorage.getItem("py-boot-seen")) {
+    boot.classList.add("hidden");
+    return;
+  }
+
+  let i = 0;
+  let finished = false;
+  function finishBoot() {
+    if (finished) return;
+    finished = true;
+    sessionStorage.setItem("py-boot-seen", "1");
+    boot.classList.add("hidden");
+    setTimeout(() => showToast({ text: "ระบบพร้อมใช้งาน — พิมพ์ help ในเทอร์มินัลมุมขวาล่างเพื่อดูคำสั่งลับ", kind: "tag", icon: "⌁" }), 500);
+  }
+  function nextLine() {
+    if (i >= BOOT_LINES.length) {
+      setTimeout(finishBoot, 550);
+      return;
+    }
+    const item = BOOT_LINES[i++];
+    const div = document.createElement("div");
+    div.className = "ln " + item.t;
+    div.textContent = item.m;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    setTimeout(nextLine, item.t === "ok" && i === BOOT_LINES.length ? 260 : 90 + Math.random() * 70);
+  }
+  nextLine();
+
+  skip.addEventListener("click", finishBoot);
+  document.addEventListener("keydown", finishBoot, { once: true });
+  boot.addEventListener("click", finishBoot);
+}
+runBoot();
+
+/* ---------- Terminal ---------- */
+const termPanel = document.getElementById("termPanel");
+const termOutput = document.getElementById("termOutput");
+const termInput = document.getElementById("termInput");
+const termBlip = document.getElementById("termBlip");
+let termOpenedOnce = false;
+
+function termPrint(text, cls) {
+  const div = document.createElement("div");
+  div.className = "out-line" + (cls ? " " + cls : "");
+  div.textContent = text;
+  termOutput.appendChild(div);
+  termOutput.scrollTop = termOutput.scrollHeight;
+}
+function termPrintEcho(text) {
+  const div = document.createElement("div");
+  div.className = "out-line in-echo";
+  div.textContent = text;
+  termOutput.appendChild(div);
+  termOutput.scrollTop = termOutput.scrollHeight;
+}
+function openTerm() {
+  termPanel.classList.add("open");
+  termBlip.style.display = "none";
+  if (!termOpenedOnce) {
+    termOpenedOnce = true;
+    termPrint("py_by.Patcharaphon terminal v2.0 — พิมพ์ 'help' เพื่อดูคำสั่งทั้งหมด", "out-dim");
+  }
+  setTimeout(() => termInput.focus(), 50);
+}
+function closeTerm() { termPanel.classList.remove("open"); }
+
+document.getElementById("termLauncher").addEventListener("click", () => {
+  termPanel.classList.contains("open") ? closeTerm() : openTerm();
+});
+document.getElementById("termClose").addEventListener("click", closeTerm);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "`" && document.activeElement !== termInput) {
+    e.preventDefault();
+    termPanel.classList.contains("open") ? closeTerm() : openTerm();
+  }
+  if (e.key === "Escape" && termPanel.classList.contains("open")) closeTerm();
+});
+
+const TERM_HELP = [
+  "help              แสดงคำสั่งทั้งหมด",
+  "whoami            ข้อมูลผู้ใช้ปัจจุบัน",
+  "ls                รายชื่อโมดูลทั้งหมด",
+  "progress          ความคืบหน้าการเรียน",
+  "matrix on|off     เปิด/ปิดฝนดิจิทัลพื้นหลัง",
+  "goto <id>         กระโดดไปบทเรียน เช่น goto 2-1",
+  "clear             ล้างหน้าจอเทอร์มินัล",
+  "theme <สี>        magenta / amber / green (เปลี่ยนสีเน้น)",
+  "sudo <อะไรก็ได้>   ลองดูสิ",
+  "exit              ปิดเทอร์มินัล"
+];
+function handleTermCommand(raw) {
+  const cmd = raw.trim();
+  termPrintEcho(cmd);
+  if (!cmd) return;
+  const [word, ...rest] = cmd.split(/\s+/);
+  const arg = rest.join(" ");
+
+  switch (word.toLowerCase()) {
+    case "help":
+      TERM_HELP.forEach(l => termPrint(l, "out-dim"));
+      break;
+    case "whoami":
+      termPrint("นักเรียน@python-from-zero — สิทธิ์: ผู้เรียนรู้ (ไม่ใช่ root, ยังไม่ต้อง sudo จริง ๆ)");
+      break;
+    case "ls":
+      COURSE.forEach(m => termPrint(m.file + "/    " + m.title));
+      break;
+    case "pwd":
+      termPrint("/home/student/python-from-zero");
+      break;
+    case "progress": {
+      const total = flatLessons().length;
+      const done = completed.length;
+      termPrint(`เรียนไปแล้ว ${done}/${total} บท (${total ? Math.round(done/total*100) : 0}%)`);
+      break;
+    }
+    case "clear":
+      termOutput.innerHTML = "";
+      break;
+    case "matrix":
+      if (arg === "off") { setMatrix(false); termPrint("ปิดฝนดิจิทัลแล้ว", "out-dim"); }
+      else { setMatrix(true); termPrint("เปิดฝนดิจิทัลพื้นหลัง — พิมพ์ 'matrix off' เพื่อปิด", "out-dim"); }
+      break;
+    case "goto": {
+      const found = findLesson(arg);
+      if (found) { goTo(arg); termPrint(`ไปยังบท ${arg}: ${found.lesson.title}`); closeMobileSidebar(); }
+      else termPrint(`ไม่พบบทเรียน id "${arg}" — ลองพิมพ์ ls เพื่อดูโมดูล`, "out-err");
+      break;
+    }
+    case "theme": {
+      const map = { magenta: "#FF5FA8", amber: "#FFC24B", green: "#3EE08C" };
+      if (map[arg]) {
+        document.documentElement.style.setProperty("--green", map[arg]);
+        termPrint(`เปลี่ยนสีเน้นเป็น ${arg} แล้ว`);
+        showToast({ text: `ธีมสีอัปเดตเป็น ${arg}`, kind: "tag", icon: "🎨" });
+      } else termPrint("ใช้ได้แค่: theme magenta / theme amber / theme green", "out-err");
+      break;
+    }
+    case "sudo":
+      if (/make me a sandwich/i.test(arg)) termPrint("Okay.  (ทำแซนวิชให้ ทันทีเพราะพิมพ์ sudo)", "out-dim");
+      else termPrint(`sudo: ${arg || "??"}: คุณไม่ได้อยู่ใน sudoers file — เหตุการณ์นี้จะถูกรายงาน (ไม่จริงหรอก)`, "out-err");
+      break;
+    case "exit":
+      closeTerm();
+      break;
+    case "echo":
+      termPrint(arg);
+      break;
+    default:
+      termPrint(`command not found: ${word} — พิมพ์ help เพื่อดูคำสั่งที่ใช้ได้`, "out-err");
+  }
+}
+termInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && termInput.value.trim() !== "") {
+    handleTermCommand(termInput.value);
+    termInput.value = "";
+  }
+});
+
+/* ping the terminal launcher once to invite exploration */
+setTimeout(() => { if (!termPanel.classList.contains("open")) termBlip.style.display = "block"; }, 4000);
 </script>
 </body>
 </html>
