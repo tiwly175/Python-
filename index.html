@@ -194,6 +194,7 @@ code,pre{font-family:'Fira Code',monospace}::selection{background:var(--gdim)}
 <main class="main" id="main"></main>
 </div>
 <script src="data.js"></script>
+<script src="data2.js"></script>
 <script>
 const COURSE=(window.RAW||[]).map(([title,file,lessons])=>({title,file,lessons:lessons.map(a=>({id:a[0],file:a[1],title:a[2],tagline:a[3],body:a[4],examples:a[5].map(e=>({label:e[0],note:e[1],code:e[2],realLabel:e[3],real:e[4]})),callout:a[6],hints:a[7],techniques:a[8],practice:a[9]}))}));
 const SKEY="py-by.Patcharaphon-progress-v2",BKEY="py-by.Patcharaphon-bookmarks-v1",TKEY="py-by.Patcharaphon-theme-v1",TPKEY="py-by.Patcharaphon-term-pos-v1",CMKEY="py-by.Patcharaphon-code-mode-v1";
