@@ -259,6 +259,12 @@
     .lesson-nav { margin: 34px 20px 0; }
     .lesson-title { font-size: 22px; }
   }
+
+@keyframes hackerPulse {
+  0% { text-shadow: 0 0 4px #00ff66, 0 0 10px #00ff66; opacity: 0.85; }
+  100% { text-shadow: 0 0 14px #00ff66, 0 0 25px #00ff66; opacity: 1; }
+}
+  
 </style>
 </head>
 <body>
@@ -266,7 +272,7 @@
 <div class="app">
   <div class="topbar">
     
-    <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0;">py_by.Patcharaphon</h1></div>
+   <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0; color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.8); animation: hackerPulse 1.5s ease-in-out infinite alternate;">py_by.Patcharaphon</h1></div>
     
     <button class="menu-toggle" id="menuToggle">☰ สารบัญ</button>
   </div>
@@ -274,8 +280,8 @@
   <nav class="sidebar" id="sidebar">
     <div class="term-head">
       <div class="term-dots"><span></span><span></span><span></span></div>
-      
-      <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0;">py_by.Patcharaphon</h1></div>
+
+      <div class="brand" style="display: flex; align-items: center; gap: 8px;"><span class="leaf">🐍</span><img src="output-image.png" style="height: 22px; width: 22px; border-radius: 50%; object-fit: cover;" alt="icon"><h1 style="margin: 0; color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.8); animation: hackerPulse 1.5s ease-in-out infinite alternate;">py_by.Patcharaphon</h1></div>
       
       <p class="brand-sub"><span class="cursor"></span>~/python-from-zero</p>
     </div>
