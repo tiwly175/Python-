@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ป่าไผ่โค้ด — เรียน Python จากศูนย์สู่เว็บแอป</title>
+<title>เรียนPython by.Patcharaphon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -265,14 +265,14 @@
 
 <div class="app">
   <div class="topbar">
-    <div class="brand"><span class="leaf">🐍</span><h1>py_dojo</h1></div>
+    <div class="brand"><span class="leaf">🐍</span><h1>py_by.Patcharaphon</h1></div>
     <button class="menu-toggle" id="menuToggle">☰ สารบัญ</button>
   </div>
 
   <nav class="sidebar" id="sidebar">
     <div class="term-head">
       <div class="term-dots"><span></span><span></span><span></span></div>
-      <div class="brand"><span class="leaf">🐍</span><h1>py_dojo</h1></div>
+      <div class="brand"><span class="leaf">🐍</span><h1>py_by.Patcharaphon</h1></div>
       <p class="brand-sub"><span class="cursor"></span>~/python-from-zero</p>
     </div>
 
@@ -678,12 +678,12 @@ const COURSE = [
 let currentId = COURSE[0].lessons[0].id;
 let completed = [];
 try {
-  const saved = localStorage.getItem("py-dojo-progress-v2");
+  const saved = localStorage.getItem("py-by.Patcharaphon-progress-v2");
   if (saved) completed = JSON.parse(saved);
 } catch (e) { completed = []; }
 
 function saveProgress() {
-  try { localStorage.setItem("py-dojo-progress-v2", JSON.stringify(completed)); }
+  try { localStorage.setItem("py-by.Patcharaphon-progress-v2", JSON.stringify(completed)); }
   catch (e) { /* storage unavailable, continue without persistence */ }
 }
 function flatLessons() { return COURSE.flatMap(m => m.lessons); }
